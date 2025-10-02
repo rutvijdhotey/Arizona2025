@@ -56,18 +56,49 @@
         .timeline-item .w-12 {
             min-width: 3rem; /* Ensure icon circles don't shrink */
         }
+        /* Style for the password protection overlay */
+        #password-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 251, 245, 0.95); /* Semi-transparent body background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 <body class="antialiased">
 
-    <header class="hero-section text-white rounded-b-lg mb-8">
+    <!-- Password Protection Overlay -->
+    <div id="password-overlay" class="p-4 hidden">
+        <div class="bg-white p-8 rounded-xl shadow-2xl max-w-sm w-full text-center">
+            <h3 class="font-display text-2xl font-bold mb-4 text-[#E07A5F]">Private Itinerary</h3>
+            <p class="text-gray-700 mb-6">Please enter the shared password to view the Arizona trip details.</p>
+            <input type="password" id="password-input" placeholder="Enter password" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E07A5F] mb-4">
+            <button id="password-submit" class="w-full px-4 py-3 text-white bg-[#E07A5F] rounded-lg hover:bg-[#d66a50] transition duration-200">
+                Unlock Adventure
+            </button>
+            <p id="error-message" class="text-red-500 mt-3 hidden text-sm">Incorrect password. Please try again.</p>
+        </div>
+    </div>
+    <!-- End Password Protection Overlay -->
+
+
+    <header id="main-header" class="hero-section text-white rounded-b-lg mb-8 hidden">
         <div class="container mx-auto p-8 sm:p-16 max-w-5xl text-center">
             <h1 class="font-display text-4xl sm:text-6xl font-bold mb-4">Our Arizona Adventure</h1>
             <p class="text-lg sm:text-xl inline-block bg-black bg-opacity-25 px-4 py-2 rounded-lg backdrop-blur-sm">A 5-Day Romantic Getaway | Oct 21st - 25th, 2025</p>
         </div>
     </header>
 
-    <div class="container mx-auto px-4 sm:px-8 max-w-5xl">
+    <div id="main-content" class="container mx-auto px-4 sm:px-8 max-w-5xl hidden">
 
         <div id="booking-checklist" class="mb-12 p-6 bg-white rounded-lg shadow-md border border-gray-200">
             <h2 class="font-display text-2xl font-bold text-[#3D405B] mb-4">✅ Booking Checklist (Updated!)</h2>
@@ -118,11 +149,64 @@
 
     </div>
     
-    <footer class="text-center p-8 mt-12 text-gray-400 text-sm">
+    <footer id="main-footer" class="text-center p-8 mt-12 text-gray-400 text-sm hidden">
         <p>Let the adventure begin!</p>
     </footer>
 
     <script>
+        // --- SECURITY SETUP ---
+        const SECRET_PASSWORD = "25234661"; // <<< UPDATED TO NEW USER-PROVIDED PASSWORD
+        const AUTH_KEY = "itineraryAuth";
+        const passwordOverlay = document.getElementById('password-overlay');
+        const passwordInput = document.getElementById('password-input');
+        const passwordSubmit = document.getElementById('password-submit');
+        const errorMessage = document.getElementById('error-message');
+        const mainHeader = document.getElementById('main-header');
+        const mainContent = document.getElementById('main-content');
+        const mainFooter = document.getElementById('main-footer');
+
+        function authenticate() {
+            const enteredPassword = passwordInput.value.trim();
+
+            if (enteredPassword === SECRET_PASSWORD) {
+                // Save authentication status in session storage
+                sessionStorage.setItem(AUTH_KEY, 'true'); 
+                showItinerary();
+            } else {
+                errorMessage.classList.remove('hidden');
+                passwordInput.value = '';
+                passwordInput.focus();
+            }
+        }
+
+        function showItinerary() {
+            passwordOverlay.classList.add('hidden');
+            mainHeader.classList.remove('hidden');
+            mainContent.classList.remove('hidden');
+            mainFooter.classList.remove('hidden');
+            renderTabs();
+            renderContent();
+        }
+
+        passwordSubmit.addEventListener('click', authenticate);
+        passwordInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                authenticate();
+            }
+        });
+
+        // Check authentication on load
+        document.addEventListener('DOMContentLoaded', () => {
+            if (sessionStorage.getItem(AUTH_KEY) === 'true') {
+                showItinerary();
+            } else {
+                // Only show overlay if not authenticated
+                passwordOverlay.classList.remove('hidden');
+            }
+        });
+
+        // --- ITINERARY LOGIC (only runs after authentication) ---
+        
         // Function to generate a Google Maps link for a specific query
         const getMapLink = (query) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
 
@@ -248,7 +332,7 @@
 
         const dayTabsContainer = document.getElementById('day-tabs');
         const contentContainer = document.getElementById('itinerary-content');
-        let activeTab = 0; // Start on Day 1 to show the map link changes
+        let activeTab = 0; 
 
         function renderContent() {
             const dayData = itineraryData[activeTab];
@@ -363,10 +447,9 @@
             }
         });
 
-        document.addEventListener('DOMContentLoaded', () => {
-            renderTabs();
-            renderContent();
-        });
+        // The initial rendering logic is now inside the DOMContentLoaded handler
+        // which includes the authentication check.
+        // document.addEventListener('DOMContentLoaded', () => { ... });
     </script>
 </body>
 </html>
