@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Arizona Adventure: An Interactive Itinerary</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Terracotta Sunset -->
+    <!-- Application Structure Plan: A single-page application with a primary navigation bar for each day. Clicking a day reveals a detailed card for that day's events, including sections for accommodations, activities, and dining. This card-based, day-by-day structure is more intuitive and less overwhelming than a long scroll. It allows users to focus on one day at a time while still having easy access to the full trip overview. A separate "Booking Checklist" section provides a clear, actionable list. -->
+    <!-- Visualization & Content Choices: The main itinerary is organized into interactive cards (HTML/CSS/JS) for clarity and focus. Hikes are presented with key stats (mileage, elevation) and a link to AllTrails, providing actionable information. Icons (Unicode) are used to visually distinguish between activities like hiking, dining, and lodging, enhancing scannability. No charts are needed as the data is qualitative, so the focus is on clean typography and interactive reveals to present the information effectively. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FFFBF5;
+            color: #3D405B;
+        }
+        .font-display {
+            font-family: 'Playfair Display', serif;
+        }
+        .hero-section {
+            /* Using a placeholder image for canyon scenery */
+            background: linear-gradient(rgba(236, 118, 55, 0.6), rgba(224, 122, 95, 0.5)), url('https://placehold.co/1500x800/E07A5F/FFFFFF?text=Arizona+Adventure');
+            background-size: cover;
+            background-position: center;
+        }
+        .tab-active {
+            background-color: #E07A5F;
+            color: #FFFFFF;
+            font-weight: 700;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .tab-inactive {
+            background-color: #F4F1DE;
+            color: #3D405B;
+        }
+        .card {
+            background-color: #FFFFFF;
+            border-left: 5px solid #E07A5F;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.05);
+            transition: all 0.3s ease-in-out;
+        }
+        .icon {
+            font-size: 1.5rem;
+            margin-right: 0.75rem;
+            color: #E07A5F;
+            flex-shrink: 0;
+        }
+        .timeline-item:last-child .timeline-connector {
+            display: none;
+        }
+        /* Mobile-specific adjustment for tight alignment */
+        .timeline-item .w-12 {
+            min-width: 3rem; /* Ensure icon circles don't shrink */
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="hero-section text-white rounded-b-lg mb-8">
+        <div class="container mx-auto p-8 sm:p-16 max-w-5xl text-center">
+            <h1 class="font-display text-4xl sm:text-6xl font-bold mb-4">Our Arizona Adventure</h1>
+            <p class="text-lg sm:text-xl inline-block bg-black bg-opacity-25 px-4 py-2 rounded-lg backdrop-blur-sm">A 5-Day Romantic Getaway | Oct 21st - 25th, 2025</p>
+        </div>
+    </header>
+
+    <div class="container mx-auto px-4 sm:px-8 max-w-5xl">
+
+        <div id="booking-checklist" class="mb-12 p-6 bg-white rounded-lg shadow-md border border-gray-200">
+            <h2 class="font-display text-2xl font-bold text-[#3D405B] mb-4">✅ Booking Checklist (Updated!)</h2>
+            <ul class="space-y-4 text-gray-700">
+                <li class="flex items-start text-green-600 font-medium">
+                    <span class="icon mt-1">✈️</span>
+                    <div>
+                        Flights Booked!
+                        <p class="text-sm text-gray-500 font-normal">American Airlines | Confirmation: SLQHJM</p>
+                    </div>
+                </li>
+                <li class="flex items-start text-green-600 font-medium">
+                    <span class="icon mt-1">🚗</span>
+                    <div>
+                        Rental Car Booked!
+                        <p class="text-sm text-gray-500 font-normal">Avis Rental | Confirmation: 39975642US0</p>
+                    </div>
+                </li>
+                 <li class="flex items-start text-green-600 font-medium">
+                    <span class="icon mt-1">🏨</span>
+                    <div>
+                        Hotel in Sedona (Night of Oct 21st)
+                        <p class="text-sm text-gray-500 font-normal">Hilton Vacation Sedona (Confirmed! 3 PM Check-in)</p>
+                    </div>
+                </li>
+                <li class="flex items-start text-gray-600">
+                    <span class="icon mt-1">❌</span> 
+                    Grand Canyon Hotel (Night of Oct 22nd) - Canceled to extend stay in Page!
+                </li>
+                 <li class="flex items-start text-green-600 font-medium">
+                    <span class="icon mt-1">🏨</span>
+                    <div>
+                        Page, AZ Hotel (Nights of Oct 22nd & 23rd)
+                        <p class="text-sm text-gray-500 font-normal">Courtyard by Marriott Page (Confirmed! Two nights!)</p>
+                    </div>
+                </li>
+                <li class="flex items-start text-gray-600"><span class="icon mt-1">🎟️</span> Antelope Canyon Tour (Updated to **1:30 PM**, Oct 23rd)</li>
+                <li class="flex items-center text-gray-600"><span class="icon">💆‍♀️</span> Scottsdale Spa Treatment (Afternoon, Oct 24th)</li>
+                <li class="flex items-center text-gray-600"><span class="icon">🏨</span> Resort/Hotel in Scottsdale (Night of Oct 24th)</li>
+            </ul>
+        </div>
+
+        <nav id="day-tabs" class="flex flex-wrap justify-center gap-3 mb-8">
+        </nav>
+
+        <main id="itinerary-content">
+        </main>
+
+    </div>
+    
+    <footer class="text-center p-8 mt-12 text-gray-400 text-sm">
+        <p>Let the adventure begin!</p>
+    </footer>
+
+    <script>
+        // Function to generate a Google Maps link for a specific query
+        const getMapLink = (query) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+
+        const itineraryData = [
+            {
+                day: "Day 1",
+                date: "Oct 21st",
+                title: "Arrival, Red Rock Wonders & Art Walk",
+                mapLink: getMapLink("Sedona,AZ"),
+                events: [
+                    { time: "11:05 AM", description: "Land in Phoenix (PHX)! Adventure begins.", icon: "✈️" },
+                    { time: "12:00 PM", description: "Pick up rental car & start the 2-hour drive to Sedona.", icon: "🚗" },
+                    { time: "2:30 PM", description: "Arrive in Sedona. Grab lunch near the hotel.", icon: "🍽️", mapLink: getMapLink("The Hudson Sedona") },
+                    { time: "3:00 PM", description: "Official hotel check-in at Hilton Vacation Sedona.", icon: "🏨", mapLink: getMapLink("Hilton Vacation Sedona") },
+                    { time: "4:30 PM", description: "First hike to ease into the scenery.", icon: "🥾",
+                      details: {
+                          name: "Bell Rock Pathway",
+                          stats: "3.6-mile loop | 380 ft elevation gain",
+                          link: "https://www.alltrails.com/trail/us/arizona/bell-rock-pathway-to-bell-rock"
+                      }
+                    },
+                    { time: "6:30 PM", description: "Explore the **Tlaquepaque Arts & Shopping Village** for local galleries, jewelry, and unique Southwestern art.", icon: "🖼️", mapLink: getMapLink("Tlaquepaque Arts & Shopping Village Sedona") },
+                ],
+                accommodations: [],
+                dining: [
+                    "The Hudson (Great views)",
+                    "Creekside American Bistro",
+                    "Elote Cafe (Local legend)"
+                ]
+            },
+            {
+                day: "Day 2",
+                date: "Oct 22nd",
+                title: "Morning Hike, Solo Explore, & Drive to Page",
+                mapLink: getMapLink("Page,AZ"),
+                events: [
+                    { time: "6:30 AM", description: "**Early Bird Hike!** Tackle the Devil's Bridge Trail before Nicolette's class.", icon: "🥾",
+                      details: {
+                          name: "Devil's Bridge Trail",
+                          stats: "3.9-mile out-and-back | 511 ft elevation gain (Target return: 8:45 AM)",
+                          link: "https://www.alltrails.com/trail/us/arizona/devils-bridge-trail"
+                      }
+                    },
+                    { time: "9:00 AM", description: "Nicolette's Class Time (9:00 AM - 12:00 PM).", icon: "💻" },
+                    { time: "9:00 AM", description: "**Your Solo Explore:** Visit the **Sedona Arts Center** or **Exposures International Gallery** for art browsing/shopping. Alternatively, grab coffee and enjoy the Red Rocks view in town.", icon: "🛍️", mapLink: getMapLink("Sedona Arts Center OR Exposures International Gallery") },
+                    { time: "12:00 PM", description: "Rejoin for check-out and quick lunch.", icon: "🍽️" },
+                    { time: "1:00 PM", description: "Start the **4-hour drive to Page, AZ**.", icon: "🚗" },
+                    { time: "5:00 PM", description: "Arrive in Page. Official hotel check-in at Courtyard by Marriott.", icon: "🏨", mapLink: getMapLink("Courtyard by Marriott Page, AZ") },
+                    { time: "6:30 PM", description: "Walk down to the Glen Canyon Dam Overlook for sunset and stay for early stargazing (Page has great dark skies!).", icon: "🌌", mapLink: getMapLink("Glen Canyon Dam Overlook, Page, AZ") },
+                ],
+                accommodations: [],
+                dining: [
+                    "Big John's Texas BBQ (Live music)",
+                    "State 48 Tavern (Casual pizza & beer)",
+                    "El Tapatio (Favorite for Mexican food)"
+                ]
+            },
+            {
+                day: "Day 3",
+                date: "Oct 23rd",
+                title: "Jetski Thrills, Slot Canyons, & Horseshoe Bend",
+                mapLink: getMapLink("Antelope Point Marina, Page, AZ"),
+                events: [
+                    { time: "8:00 AM", description: "**Morning Water Thrill!** Rent a Jet Ski at Lake Powell and explore the canyons by water.", icon: "🏍️",
+                        details: {
+                            name: "Jet Ski Rental (Antelope Point Marina)",
+                            stats: "Book Rentals Here for Sea-Doo/WaveRunner excitement on Lake Powell.",
+                            link: "https://antelopepointlakepowell.com/seadoo/"
+                        }
+                    },
+                    { time: "12:00 PM", description: "Return Jet Ski. Lunch and prep for the Antelope Canyon tour.", icon: "🍽️" },
+                    { time: "1:30 PM", description: "Pre-booked tour of Antelope Canyon (The best light occurs around midday/early afternoon!).", icon: "🎟️", mapLink: getMapLink("Antelope Canyon Tour Check-in Page, AZ") },
+                    { time: "4:00 PM", description: "Visit the stunning Horseshoe Bend overlook.", icon: "🏞️", mapLink: getMapLink("Horseshoe Bend Overlook, Page, AZ") },
+                    { time: "Evening", description: "**Local Culture:** Spend time exploring the local shops and galleries in Page for Native American art and unique souvenirs.", icon: "🛍️", mapLink: getMapLink("Page, AZ Local Shops") },
+                ],
+                accommodations: [],
+                dining: [
+                    "Big John's Texas BBQ (Live music)",
+                    "State 48 Tavern (Casual pizza & beer)",
+                    "El Tapatio (Favorite for Mexican food)"
+                ]
+            },
+            {
+                day: "Day 4",
+                date: "Oct 24th",
+                title: "The Journey South & Our Spa Escape",
+                mapLink: getMapLink("Scottsdale,AZ"),
+                events: [
+                    { time: "Morning", description: "Relaxed breakfast in Page.", icon: "☕" },
+                    { time: "9:00 AM", description: "Official check-out from Courtyard by Marriott. Hit the road for the 4.5-hour drive to Scottsdale.", icon: "🚗" },
+                    { time: "1:30 PM", description: "Arrive in Scottsdale. Grab a quick lunch.", icon: "🍽️" },
+                    { time: "3:00 PM", description: "Official hotel check-in at our resort.", icon: "🏨" },
+                    { time: "Afternoon", description: "Time to unwind! Our pre-booked spa appointment awaits.", icon: "💆‍♀️" },
+                    { time: "Evening", description: "Get dressed up for a final, celebratory dinner.", icon: "🥂", mapLink: getMapLink("The Mission Old Town Scottsdale") }
+                ],
+                accommodations: [
+                    "The Scott Resort & Spa (Lush vibe)",
+                    "Hotel Valley Ho (Mid-century style)",
+                    "Sanctuary Camelback Mountain (Ultimate splurge)"
+                ],
+                dining: [
+                    "The Mission Old Town (Romantic Latin cuisine)",
+                    "Citizen Public House (Stylish gastropub)",
+                    "Postino (Famous bruschetta boards)"
+                ]
+            },
+            {
+                day: "Day 5",
+                date: "Oct 25th",
+                title: "Last Taste of Luxury & Homeward Bound",
+                mapLink: getMapLink("Phoenix Sky Harbor International Airport"),
+                events: [
+                    { time: "Morning", description: "Enjoy the resort amenities, have a swim, and a leisurely brunch.", icon: "🏊‍♂️" },
+                    { time: "11:00 AM", description: "Official check-out from Scottsdale resort.", icon: "🔑" },
+                    { time: "3:30 PM", description: "Time to head to the Phoenix airport.", icon: "🚗" },
+                    { time: "4:00 PM", description: "Return rental car.", icon: "🔑" },
+                    { time: "6:06 PM", description: "Flight departs. An amazing trip comes to an end!", icon: "✈️" }
+                ],
+                accommodations: [],
+                dining: []
+            }
+        ];
+
+        const dayTabsContainer = document.getElementById('day-tabs');
+        const contentContainer = document.getElementById('itinerary-content');
+        let activeTab = 0; // Start on Day 1 to show the map link changes
+
+        function renderContent() {
+            const dayData = itineraryData[activeTab];
+            
+            // Function to safely convert Markdown bold (**text**) to HTML strong (<strong>text</strong>)
+            const formatDescription = (text) => {
+                // Ensure text is treated as a string and replace **...** with <strong>...</strong>
+                return String(text).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            };
+
+            contentContainer.innerHTML = `
+                <div class="card p-6 sm:p-8 rounded-lg animate-fade-in">
+                    <div class="flex justify-between items-start mb-6">
+                        <h2 class="font-display text-3xl font-bold text-[#3D405B]">${dayData.day}: ${dayData.title}</h2>
+                        <a href="${dayData.mapLink}" target="_blank" rel="noopener noreferrer" class="flex-shrink-0 ml-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-[#E07A5F] hover:bg-[#d66a50] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#E07A5F]">
+                            🗺️ <span class="ml-2 hidden sm:inline">View Day Map</span>
+                        </a>
+                    </div>
+                    <div class="space-y-2">
+                        ${dayData.events.map(event => `
+                            <div class="flex timeline-item">
+                                <div class="flex flex-col items-center mr-4">
+                                    <div>
+                                        <div class="flex items-center justify-center w-12 h-12 rounded-full bg-[#F4F1DE]">
+                                            <span class="text-2xl">${event.icon}</span>
+                                        </div>
+                                    </div>
+                                    <div class="w-px h-full bg-gray-200 timeline-connector"></div>
+                                </div>
+                                <div class="pb-8 w-full">
+                                    <p class="mb-1 text-sm font-semibold text-[#E07A5F]">${event.time}</p>
+                                    <p class="text-gray-800">${formatDescription(event.description)}</p>
+                                    ${event.mapLink ? `
+                                        <a href="${event.mapLink}" target="_blank" rel="noopener noreferrer" class="text-sm text-blue-600 hover:underline flex items-center mt-1">
+                                            📍 View Location on Map
+                                        </a>
+                                    ` : ''}
+                                    ${event.details ? `
+                                        <div class="mt-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                            <p class="font-bold text-gray-700">${event.details.name}</p>
+                                            <p class="text-sm text-gray-500">${event.details.stats}</p>
+                                            ${event.details.link ? `<a href="${event.details.link}" target="_blank" rel="noopener noreferrer" class="text-sm text-blue-600 hover:underline">View Details &rarr;</a>` : ''}
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    ${dayData.accommodations.length > 0 ? `
+                        <div class="mt-6 pt-6 border-t border-gray-200">
+                            <h3 class="font-bold text-xl text-[#3D405B] mb-3 flex items-center"><span class="icon">🏨</span> Accommodation Ideas</h3>
+                            <ul class="list-disc list-inside space-y-1 text-gray-600 pl-4">
+                                ${dayData.accommodations.map(item => `<li>${item}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+
+                    ${dayData.dining.length > 0 ? `
+                        <div class="mt-6 pt-6 border-t border-gray-200">
+                            <h3 class="font-bold text-xl text-[#3D405B] mb-3 flex items-center"><span class="icon">🍽️</span> Dining Ideas</h3>
+                            <ul class="list-disc list-inside space-y-1 text-gray-600 pl-4">
+                                ${dayData.dining.map(item => `<li>${item}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            const style = document.createElement('style');
+            style.innerHTML = `
+                @keyframes fade-in {
+                    0% { opacity: 0; transform: translateY(10px); }
+                    100% { opacity: 1; transform: translateY(0); }
+                }
+                .animate-fade-in {
+                    animation: fade-in 0.5s ease-in-out;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        function renderTabs() {
+            let tabsHTML = itineraryData.map((day, index) => `
+                <button data-index="${index}" class="day-tab px-4 py-2 rounded-lg text-sm sm:text-base transition-all duration-300 transform hover:scale-105">
+                    ${day.day} <span class="hidden sm:inline">- ${day.date}</span>
+                </button>
+            `).join('');
+
+            dayTabsContainer.innerHTML = tabsHTML;
+            const tabs = dayTabsContainer.querySelectorAll('.day-tab');
+
+            tabs.forEach((tab, index) => {
+                if (index === activeTab) {
+                    tab.classList.add('tab-active');
+                    tab.classList.remove('tab-inactive');
+                } else {
+                    tab.classList.add('tab-inactive');
+                    tab.classList.remove('tab-active');
+                }
+            });
+        }
+
+        dayTabsContainer.addEventListener('click', (e) => {
+            const tabButton = e.target.closest('.day-tab');
+            if (tabButton) {
+                const index = parseInt(tabButton.dataset.index);
+                if (index !== activeTab) {
+                    activeTab = index;
+                    renderTabs();
+                    renderContent();
+                }
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTabs();
+            renderContent();
+        });
+    </script>
+</body>
+</html>
